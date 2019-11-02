@@ -13,6 +13,8 @@ func (p *Execute) Reset() { // 乖離加速度Logic@taro
 	if 0 < l {                                       // 不要部分を削除
 		p.PricesPast = p.PricesPast[l:]
 		p.SizesPast = p.SizesPast[l:]
+		p.Prices = []float64{}
+		p.Sizes = []float64{}
 	}
 
 	sma := ((mean - meanLast) + mean) / meanLast
