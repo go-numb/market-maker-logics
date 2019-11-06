@@ -40,8 +40,11 @@ func (p *Execute) Reset(spanVolume float64) { // 乖離加速度Logic@taro
 
 	sma := ((devAvg - devAvgPast) + devAvg) / devAvgPast
 
-	p.AskDistance = mean * (sma + RANGEPARPRICE)
-	p.BidDistance = mean * (sma - RANGEPARPRICE)
+	// LTP価格群に直近乖離率を乗算し、LTP後の中央価格を算出（したつもりになる
+	makeFuturePrice := mean * devAvgPast
+
+	p.AskDistance = makeFuturePrice * (sma + RANGEPARPRICE)
+	p.BidDistance = makeFuturePrice * (sma - RANGEPARPRICE)
 
 	// (乖離平均 > 1(価格上昇傾向) and 指標 > 1(ltp上昇してない))
 	// or
