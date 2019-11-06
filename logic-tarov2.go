@@ -13,7 +13,8 @@ func (p *Execute) Reset(spanVolume float64) { // 乖離加速度Logic@taro
 	p.Lock()
 	defer p.Unlock()
 
-	devAvg := p.Price / stat.Mean(p.Prices, nil) // 直近n秒乖離
+	mean := stat.Mean(p.Prices, nil)
+	devAvg := p.Price / mean // 直近n秒乖離
 
 	// 現在を過去n秒の配列に追加
 	l := len(p.PricesPast)
@@ -39,8 +40,8 @@ func (p *Execute) Reset(spanVolume float64) { // 乖離加速度Logic@taro
 
 	sma := ((devAvg - devAvgPast) + devAvg) / devAvgPast
 
-	p.AskDistance = p.Price * (sma + RANGEPARPRICE)
-	p.BidDistance = p.Price * (sma - RANGEPARPRICE)
+	p.AskDistance = mean * (sma + RANGEPARPRICE)
+	p.BidDistance = mean * (sma - RANGEPARPRICE)
 
 	// (乖離平均 > 1(価格上昇傾向) and 指標 > 1(ltp上昇してない))
 	// or
@@ -52,9 +53,11 @@ func (p *Execute) Reset(spanVolume float64) { // 乖離加速度Logic@taro
 
 	if 1 < devAvgPast && 1 < ind ||
 		devAvgPast < 1 && ind < 1 {
-		fmt.Println("Go trade, buy & sell orders")
+		// fmt.Println("Go trade, buy & sell both orders")
+		p.IsOrderByDeistance = true
 	} else {
-		fmt.Println("---------------------------")
+		// fmt.Println("---------------------------")
+		p.IsOrderByDeistance = false
 	}
 
 	p.Volume = 0
